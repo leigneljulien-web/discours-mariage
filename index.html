@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Discours des Témoins — JA & Magali</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            font-family: 'Lato', sans-serif;
+            background: #faf8f5;
+            color: #3d3d3d;
+            height: 100%;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Page container */
+        .page {
+            display: none;
+            min-height: 100vh;
+            min-height: 100dvh;
+            padding: 20px 16px 90px;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .page.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cover page */
+        .cover {
+            background: linear-gradient(135deg, #f5e6d3 0%, #fdf2e9 50%, #f0e0d0 100%);
+            text-align: center;
+            padding: 40px 24px 100px;
+            justify-content: center;
+        }
+
+        .cover h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.8rem, 6vw, 3rem);
+            color: #8b6914;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+            line-height: 1.2;
+        }
+
+        .cover h2 {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: clamp(1.2rem, 4vw, 1.8rem);
+            color: #b8860b;
+            font-weight: 400;
+            margin-bottom: 30px;
+        }
+
+        .cover .ornament {
+            font-size: 1.8rem;
+            color: #d4a853;
+            margin: 15px 0;
+        }
+
+        .cover .instruction {
+            font-size: 0.95rem;
+            color: #8b7355;
+            margin-top: 40px;
+            opacity: 0.8;
+            line-height: 1.5;
+        }
+
+        .cover-photo {
+            width: 240px;
+            height: 240px;
+            margin: 24px auto;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 12px 40px rgba(139, 105, 20, 0.2), 0 0 0 6px rgba(255, 255, 255, 0.9);
+        }
+
+        .cover-photo img {
+            display: block;
+            width: 110%;
+            height: 110%;
+            margin: -5% 0 0 -5%;
+            object-fit: cover;
+            object-position: center 70%;
+            filter: grayscale(100%);
+        }
+
+        .swipe-hint {
+            display: none;
+            font-size: 0.85rem;
+            color: #a08050;
+            margin-top: 12px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        /* Content pages */
+        .content-page {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            padding-top: 10px;
+        }
+
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.2rem, 4vw, 1.6rem);
+            color: #8b6914;
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e8d5b7;
+        }
+
+
+        .photos-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            align-items: center;
+            margin-top: 12px;
+        }
+
+        .photo-container {
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 600px;
+            flex-shrink: 0;
+            background: #fff;
+        }
+
+        .photo-container img {
+            display: block;
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+        }
+
+        /* Navigation */
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 12px 16px;
+            padding-bottom: max(12px, env(safe-area-inset-bottom));
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.06);
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background: linear-gradient(135deg, #d4a853, #b8860b);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-family: 'Lato', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            letter-spacing: 0.3px;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            min-height: 48px;
+        }
+
+        .nav-btn:active {
+            transform: scale(0.95);
+            opacity: 0.9;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.25;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .page-indicator {
+            font-family: 'Playfair Display', serif;
+            color: #8b6914;
+            font-size: 0.85rem;
+        }
+
+        /* Decorative elements */
+        .floral-top, .floral-bottom {
+            position: fixed;
+            opacity: 0.05;
+            pointer-events: none;
+            font-size: 6rem;
+            color: #8b6914;
+        }
+
+        .floral-top {
+            top: -10px;
+            right: -10px;
+        }
+
+        .floral-bottom {
+            bottom: 70px;
+            left: -10px;
+        }
+
+        /* Finale page */
+        .finale {
+            background: linear-gradient(135deg, #f5e6d3 0%, #fdf2e9 50%, #f0e0d0 100%);
+            text-align: center;
+            justify-content: flex-start;
+            padding: 30px 20px 100px;
+        }
+
+        .finale h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.5rem, 5vw, 2.2rem);
+            color: #8b6914;
+            margin-bottom: 20px;
+            line-height: 1.3;
+        }
+
+        .finale p {
+            font-size: 1.1rem;
+            color: #6b5a3a;
+            line-height: 1.6;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .finale .ornament {
+            font-size: 2rem;
+            color: #d4a853;
+            margin: 20px 0;
+        }
+
+        .finale-photos {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            margin-top: 28px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .finale-photo {
+            width: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            background: #fff;
+        }
+
+        .finale-photo img {
+            display: block;
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+            filter: grayscale(100%);
+        }
+
+        /* Desktop enhancements */
+        @media (min-width: 769px) {
+            .page {
+                padding: 40px 30px 100px;
+            }
+
+            .photos-grid {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 20px;
+            }
+
+            .photo-container {
+                max-width: 45%;
+                flex: 1 1 300px;
+            }
+
+            .photos-grid.single .photo-container {
+                max-width: 600px;
+                flex: none;
+            }
+
+            .nav-btn {
+                padding: 14px 36px;
+            }
+
+            .nav-btn:hover:not(:disabled) {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 15px rgba(184, 134, 11, 0.4);
+            }
+        }
+
+        /* Small phones */
+        @media (max-width: 380px) {
+            .nav-btn {
+                padding: 12px 16px;
+                font-size: 0.9rem;
+            }
+            .page-title {
+                font-size: 1.1rem;
+            }
+        }
+
+        /* Touch device detection */
+        @media (hover: none) and (pointer: coarse) {
+            .swipe-hint {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Decorative elements -->
+    <div class="floral-top">✿</div>
+    <div class="floral-bottom">❀</div>
+
+    <!-- Page 0: Cover -->
+    <div class="page cover active" data-page="0">
+        <div class="ornament">✦ ❦ ✦</div>
+        <h1>Discours des Témoins</h1>
+        <h2>Mariage de Magali & JA</h2>
+        <div class="cover-photo">
+            <img src="photos/Page 0 - accueil/fD1hg5eFQJeUQZFBTU8aSA.jpeg" alt="JA & Magali">
+        </div>
+        <div class="ornament">~ ❧ ~</div>
+        <p class="instruction">Appuyez sur « Suivant » pour accompagner le discours en images</p>
+        <p class="swipe-hint">👆 ou swipez vers la gauche</p>
+    </div>
+
+    <!-- ===== PARTIE 1 — MARCO (lycée) ===== -->
+
+    <!-- Page 1: Photo de classe — "On rentrait en seconde au lycée Émile-Zola" -->
+    <div class="page" data-page="1">
+        <div class="content-page">
+            <h2 class="page-title">🎒 Lycée Émile-Zola, Rennes — 2003</h2>
+            <div class="photos-grid single">
+                <div class="photo-container">
+                    <img src="photos/Page 1 - photo de classe/WhatsApp Image 2026-05-12 at 14.57.00.jpeg" alt="Photo de classe" loading="lazy">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page 2: Dans les bars — "Rue de la soif, Le Pharaon, recherches scientifiques" -->
+    <div class="page" data-page="2">
+        <div class="content-page">
+            <h2 class="page-title">🍻 Recherches scientifiques à Rennes</h2>
+            <div class="photos-grid">
+                <div class="photo-container">
+                    <img src="photos/Page 2 - photos dans les bars/WhatsApp Image 2026-05-09 at 16.45.05.jpeg" alt="Dans les bars" loading="lazy">
+                </div>
+                <div class="photo-container">
+                    <img src="photos/Page 2 - photos dans les bars/WhatsApp Image 2026-05-09 at 16.45.06.jpeg" alt="Dans les bars" loading="lazy">
+                </div>
+                <div class="photo-container">
+                    <img src="photos/Page 2 - photos dans les bars/WhatsApp Image 2026-05-09 at 16.45.06 (1).jpeg" alt="Dans les bars" loading="lazy">
+                </div>
+                <div class="photo-container">
+                    <img src="photos/Page 2 - photos dans les bars/WhatsApp Image 2026-05-09 at 16.45.07.jpeg" alt="Dans les bars" loading="lazy">
+                </div>
+                <div class="photo-container">
+                    <img src="photos/Page 2 - photos dans les bars/WhatsApp Image 2026-05-09 at 16.45.07 (1).jpeg" alt="Dans les bars" loading="lazy">
+                </div>
+                <div class="photo-container">
+                    <img src="photos/Page 2 - photos dans les bars/WhatsApp Image 2026-05-09 at 16.45.07 (2).jpeg" alt="Dans les bars" loading="lazy">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page 3: Meeting politique — "Meeting de Sarkozy à Lorient" -->
+    <div class="page" data-page="3">
+        <div class="content-page">
+            <h2 class="page-title">🏛️ L'expérience politique — Lorient, 2007</h2>
+            <div class="photos-grid single">
+                <div class="photo-container">
+                    <img src="photos/Page 3 - photo en meeting politique/WhatsApp Image 2026-05-09 at 16.45.07 (3).jpeg" alt="Meeting politique" loading="lazy">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== PARTIE 2 — JULIEN (école de commerce, entremetteur) ===== -->
+
+    <!-- Page 4: Skema — "JA franchit la porte de Skema" -->
+    <div class="page" data-page="4">
+        <div class="content-page">
+            <h2 class="page-title">📚 Skema — L'éternel étudiant</h2>
+            <div class="photos-grid single">
+                <div class="photo-container">
+                    <img src="photos/Page 4 - Skema/Photo 1 - Ecole.jpeg" alt="JA à Skema" loading="lazy">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page 5: Malade — "L'éternel convalescent" -->
+    <div class="page" data-page="5">
+        <div class="content-page">
+            <h2 class="page-title">🤒 L'éternel convalescent</h2>
+            <div class="photos-grid">
+                <div class="photo-container">
+                    <img src="photos/Page 5 - Malade/2023-09-27_11-06-11_000.jpeg" alt="JA malade" loading="lazy">
+                </div>
+                <div class="photo-container">
+                    <img src="photos/Page 5 - Malade/IMG_7573.JPG" alt="JA malade" loading="lazy">
+                </div>
+                <div class="photo-container">
+                    <img src="photos/Page 5 - Malade/Photo 2 - JA malade.jpeg" alt="JA malade" loading="lazy">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page 6: Globe Trotteur — "Campus Antibes, Raleigh" -->
+    <div class="page" data-page="6">
+        <div class="content-page">
+            <h2 class="page-title">🌍 Le Globe-Trotteur — Antibes, Raleigh…</h2>
+            <div class="photos-grid">
+                <div class="photo-container">
+                    <img src="photos/Page 6 - Globe Trotteur/2026-04-29_22-42-15_463.jpeg" alt="Globe-trotteur" loading="lazy">
+                </div>
+                <div class="photo-container">
+                    <img src="photos/Page 6 - Globe Trotteur/2026-04-29_22-59-56_466.jpeg" alt="Globe-trotteur" loading="lazy">
+                </div>
+                <div class="photo-container">
+                    <img src="photos/Page 6 - Globe Trotteur/2026-04-29_23-00-48_512.jpeg" alt="Globe-trotteur" loading="lazy">
+                </div>
+                <div class="photo-container">
+                    <img src="photos/Page 6 - Globe Trotteur/2026-04-29_23-10-06_444.jpeg" alt="Globe-trotteur" loading="lazy">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page 7: Passions — "Géopolitique, survivalisme, jeux de société" -->
+    <div class="page" data-page="7">
+        <div class="content-page">
+            <h2 class="page-title">🎯 Survivalistes & Géopoliticiens</h2>
+            <div class="photos-grid">
+                <div class="photo-container">
+                    <img src="photos/Page 8 - Passions/2025-10-23_21-54-30_000.jpeg" alt="Passions" loading="lazy">
+                </div>
+                <div class="photo-container">
+                    <img src="photos/Page 8 - Passions/2026-04-29_22-58-49_329.jpeg" alt="Passions" loading="lazy">
+                </div>
+                <div class="photo-container">
+                    <img src="photos/Page 8 - Passions/2026-04-29_22-58-53_414.jpeg" alt="Passions" loading="lazy">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page 8: Magali Lille — "La braderie de Lille, la rencontre" -->
+    <div class="page" data-page="8">
+        <div class="content-page">
+            <h2 class="page-title">💜 La Braderie de Lille — La Rencontre</h2>
+            <div class="photos-grid">
+                <div class="photo-container">
+                    <img src="photos/Page 7 - Magali Lille/2013-07-21_01-24-36_000.jpeg" alt="Magali à Lille" loading="lazy">
+                </div>
+                <div class="photo-container">
+                    <img src="photos/Page 7 - Magali Lille/2014-03-09_16-43-13_000.jpeg" alt="Magali à Lille" loading="lazy">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== PARTIE 3 — KUBLER (vie pro) ===== -->
+
+    <!-- Page 9: Vie Pro — "Indiana Jones de Klépierre, le style, l'attitude, la performance" -->
+    <div class="page" data-page="9">
+        <div class="content-page">
+            <h2 class="page-title">💼 L'Indiana Jones de Klépierre</h2>
+            <div class="photos-grid">
+                <div class="photo-container">
+                    <img src="photos/Page 9 - Vie Pro/2016-12-17_23-50-07_113.jpeg" alt="JA au travail" loading="lazy">
+                </div>
+                <div class="photo-container">
+                    <img src="photos/Page 9 - Vie Pro/2021-08-22_19-58-16_000.jpeg" alt="JA vie pro" loading="lazy">
+                </div>
+                <div class="photo-container">
+                    <img src="photos/Page 9 - Vie Pro/2022-08-12_22-47-02_857.jpeg" alt="JA vie pro" loading="lazy">
+                </div>
+                <div class="photo-container">
+                    <img src="photos/Page 9 - Vie Pro/2024-09-21_11-52-29_000.jpeg" alt="JA vie pro" loading="lazy">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== CONCLUSION ===== -->
+
+    <!-- Page 10: Finale -->
+    <div class="page finale" data-page="10">
+        <div class="ornament">✦ ❦ ✦</div>
+        <h2>Vive les Mariés</h2>
+        <p>Magali, JA — vous formez un couple solide, complice, et heureux.<br>Avec Mathis et Lou, vous avez construit quelque chose de beau.</p>
+        <div class="ornament" style="margin: 16px 0;">🥂</div>
+        <p>On vous souhaite tout le meilleur pour la suite.</p>
+        <div class="finale-photos">
+            <div class="finale-photo">
+                <img src="photos/Page 10 - felicitations/2023-08-07_18-01-53_000.jpeg" alt="JA & Magali" loading="lazy">
+            </div>
+            <div class="finale-photo">
+                <img src="photos/Page 10 - felicitations/capture-2026-05-14.png" alt="JA & Magali" loading="lazy">
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-bar">
+        <button class="nav-btn" id="prevBtn" onclick="changePage(-1)" disabled>← Préc.</button>
+        <span class="page-indicator" id="pageIndicator">0 / 10</span>
+        <button class="nav-btn" id="nextBtn" onclick="changePage(1)">Suivant →</button>
+    </div>
+
+    <script>
+        let currentPage = 0;
+        const totalPages = 10;
+
+        function changePage(direction) {
+            const pages = document.querySelectorAll('.page');
+            pages[currentPage].classList.remove('active');
+
+            currentPage += direction;
+            currentPage = Math.max(0, Math.min(currentPage, totalPages));
+
+            const newPage = pages[currentPage];
+            newPage.classList.add('active');
+            newPage.scrollTop = 0;
+            window.scrollTo(0, 0);
+            updateNav();
+        }
+
+        function updateNav() {
+            document.getElementById('prevBtn').disabled = currentPage === 0;
+            document.getElementById('nextBtn').disabled = currentPage === totalPages;
+            document.getElementById('pageIndicator').textContent = `${currentPage} / ${totalPages}`;
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                if (currentPage < totalPages) changePage(1);
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                if (currentPage > 0) changePage(-1);
+            }
+        });
+
+        // Touch/swipe support
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let isSwiping = false;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+            touchStartY = e.changedTouches[0].screenY;
+            isSwiping = true;
+        }, { passive: true });
+
+        document.addEventListener('touchmove', (e) => {
+            if (!isSwiping) return;
+            const diffY = Math.abs(e.changedTouches[0].screenY - touchStartY);
+            const diffX = Math.abs(e.changedTouches[0].screenX - touchStartX);
+            if (diffY > diffX) {
+                isSwiping = false;
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchend', (e) => {
+            if (!isSwiping) return;
+            const diff = touchStartX - e.changedTouches[0].screenX;
+            if (Math.abs(diff) > 60) {
+                if (diff > 0 && currentPage < totalPages) changePage(1);
+                else if (diff < 0 && currentPage > 0) changePage(-1);
+            }
+            isSwiping = false;
+        }, { passive: true });
+    </script>
+</body>
+</html>
